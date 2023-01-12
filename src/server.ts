@@ -1,9 +1,11 @@
 import cors from 'cors'
+import dotenv from "dotenv"
 import express from 'express'
 import { Server as HttpServer } from 'http'
 import { Server } from 'socket.io'
 
-const PORT = 3000
+dotenv.config()
+const PORT = process.env.PORT ?? 3001
 const app = express()
 const server = new HttpServer(app)
 const io = new Server(server, {
@@ -42,6 +44,11 @@ io.on('connection', async (socket) => {
   })
 })
 
+app.get("/", (req, res) => {
+  res.send("pagina principal del server")
+})
+
 server.listen(PORT, () => {
+  console.log(PORT)
   console.log(`SERVER RUNNING ON PORT ${PORT}`)
 })

@@ -17,13 +17,11 @@ const io = new Server(server, {
 app.use(cors())
 
 io.on('connection', async (socket) => {
-  const user = socket.id
-
   const roomName = socket.handshake.query.roomName as string
   await socket.join(roomName)
 
   const usersOnline = (await io.in(roomName).fetchSockets()).length
-  socket.broadcast.to(roomName).emit("onlineUsers", usersOnline)
+  io.to(roomName).emit("onlineUsers", usersOnline)
 
   socket.on('mousePos', (data) => {
     socket.to(roomName).emit('mousePos', data)
@@ -38,12 +36,12 @@ io.on('connection', async (socket) => {
   })
 
   socket.on('chatMessage', (data) => {
-    socket.broadcast.to(roomName).emit('chatMessage', data)
+    io.to(roomName).emit('chatMessage', data)
   })
 
   socket.on('disconnect', async () => {
       const usersOnline = (await io.in(roomName).fetchSockets()).length
-      socket.broadcast.to(roomName).emit("onlineUsers", usersOnline)
+      io.to(roomName).emit("onlineUsers", usersOnline)
   })
 })
 

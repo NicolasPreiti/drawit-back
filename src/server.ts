@@ -22,6 +22,9 @@ io.on('connection', async (socket) => {
   const roomName = socket.handshake.query.roomName as string
   await socket.join(roomName)
 
+  const usersOnline = (await io.in(roomName).fetchSockets()).length
+  socket.broadcast.to(roomName).emit("onlineUsers", usersOnline)
+
   socket.on('mousePos', (data) => {
     socket.to(roomName).emit('mousePos', data)
   })
@@ -38,9 +41,9 @@ io.on('connection', async (socket) => {
     socket.broadcast.to(roomName).emit('chatMessage', data)
   })
 
-  socket.on('disconnect', () => {
-    // console.log(io.sockets.adapter.rooms.get('riki'))
-    console.log('socket disconnect')
+  socket.on('disconnect', async () => {
+      const usersOnline = (await io.in(roomName).fetchSockets()).length
+      socket.broadcast.to(roomName).emit("onlineUsers", usersOnline)
   })
 })
 
